@@ -1,21 +1,22 @@
 <template>
     <div class="wrapper">
-        <template v-for="(page, index) in pages">
-            <div v-if="selected.page == index + 1" class="page">
-                <img :src="page" alt="" />
+        <div v-if="selected.page == 1" class="index">
+            <ul class="menu">
+                <li @click="selectPage(2)">Организационно-профсоюзная работа</li>
+                <li @click="selectPage(3)">Общественный контроль за состоянием условий и охраны труда</li>
+                <li @click="selectPage(6)">Правовая и колдоговорная работа</li>
+                <li @click="selectPage(7)">Социальная, спортивная и культурно-массовая работа</li>
+                <li @click="selectPage(12)">Информационная работа и работа с молодежью</li>
+            </ul>
+        </div>
 
-                <div v-if="selected.page == 1" class="index">
-                    <ul class="menu">
-                        <li @click="selectPage(2)">Организационно-профсоюзная работа</li>
-                        <li @click="selectPage(3)">Общественный контроль за состоянием условий и охраны труда</li>
-                        <li @click="selectPage(6)">Правовая и колдоговорная работа</li>
-                        <li @click="selectPage(7)">Социальная, спортивная и культурно-массовая работа</li>
-                        <li @click="selectPage(12)">Информационная работа и работа с молодежью</li>
-                    </ul>
-                </div>
+        <template v-for="(page, index) in pages">
+            <div class="page" :id="'page_' + (index + 1)">
+                <img :src="page" alt="" />
             </div>
         </template>
-        <div v-if="views.panel" class="panel">
+
+        <div v-if="selected.page != 1" class="panel">
             <button :class="{ hidden: !prevButton }" @click="prevPage()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-short" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
@@ -33,8 +34,6 @@
                 </svg>
             </button>
         </div>
-
-        <div v-if="views.fadeout" class="fadeout"></div>
 
         <v-idle :duration="60" :events="['click', 'touchstart', 'touchmove', 'touchend', 'mousemove', 'scroll']" @idle="selectPage(1)" />
     </div>
@@ -63,15 +62,12 @@ export default {
             selected: {
                 page: 1,
             },
-
-            views: {
-                panel: false,
-                fadeout: false,
-            }
         }
     },
     mounted() {
         document.oncontextmenu = new Function("return false;")
+
+        this.selectPage(1)
     },
     computed: {
         prevButton() {
@@ -95,25 +91,11 @@ export default {
     },
     methods: {
         selectPage(page) {
-            if(this.selected.page == page) {
-                return
-            }
+            location.href = "#" + 'page_' + page
 
-            this.views.fadeout = true
+            window.scrollTo(0, 1000)
 
-            setTimeout(() => {
-                this.selected.page = page
-
-                if(this.selected.page == 1) {
-                    this.views.panel = false
-                } else {
-                    this.views.panel = true
-                }
-            }, 150)
-
-            setTimeout(() => {
-                this.views.fadeout = false
-            }, 300)
+            this.selected.page = page
         },
         prevPage() {
             let index = this.selected.page - 1
@@ -137,8 +119,8 @@ export default {
 html, body {
         margin: 0;
         position: relative;
-        width: 1920px;
-        height: 1080px;
+        width: 100vw;
+        height: 100vh;
         overflow: hidden;
         font-family: 'HeliosCond';
         font-weight: 400;
@@ -152,15 +134,21 @@ html, body {
     }
     .wrapper {
         position: relative;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         overflow: hidden;
         background-color: #fff;
         color: #333;
     }
+    .page {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
     .page img {
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
     }
     .panel {
         position: fixed;
@@ -244,24 +232,11 @@ html, body {
         background-color: rgba(29, 116, 187, 0.25);
         color: transparent;
     }
-    .fadeout {
-        position: absolute;
-        z-index: 10;
-        background-color: #fff;
-        width: 100vw;
-        height: 100vh;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        animation-name: fadeout;
-        animation-duration: 0.2s;
-    }
-    @keyframes fadeout {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
     .hidden {
         visibility: hidden;
+    }
+    .v-idle {
+        opacity: 0;
+
     }
 </style>
